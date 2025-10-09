@@ -33,7 +33,7 @@ jobs:
     steps:
       - name: Waiting for manual release
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.POLLING_TOKEN }}
           REPO: ${{ github.repository }}
           FILE_PATH: "release_trigger.txt"
         run: |
