@@ -32,12 +32,18 @@ jobs:
     needs: [job1, job2, job3, job4]
     steps:
       - name: Waiting for manual release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          FILE_PATH: "release_trigger.txt"
         run: |
-          echo "Job 5 is waiting..."
-          while [ ! -f "$GITHUB_WORKSPACE/release_trigger.txt" ]; do
-            sleep 5
-            echo "Still waiting..."
-
+          echo "Job 5 is now waiting for release_trigger.txt..."
+          while true; do
+            status_code=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" https://api.github.com/repos/$REPO/contents/$FILE_PATH)
+            if [ "$status_code" -eq 200 ]; then
+              echo "Release_trigger.txt detected! Proceeding with Job 5.."
+              break
+            fi
+            echo "Still waiting for API Trigger..."
+            sleep 10
           done
-
-          echo "Release detected. Proceeding.."
