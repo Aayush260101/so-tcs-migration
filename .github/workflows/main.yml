@@ -1,6 +1,12 @@
 name: Test Workflow
+
 on:
   workflow_dispatch:
+    inputs:
+      fail_job4:
+        description: "Set to true to simulate failure in Job 4"
+        required: false
+        default: "false"
 
 jobs:
   job1:
@@ -14,19 +20,25 @@ jobs:
     steps:
       - name: Job 2
         run: echo "Hello World from Job 2"
-        
+
   job3:
     runs-on: ubuntu-latest
     steps:
       - name: Job 3
         run: echo "Hello World from Job 3"
-        
+
   job4:
     runs-on: ubuntu-latest
     steps:
-      - name: Job 4
-        run: echo "Hello World from Job 4"
-        
+      - name: Simulate Job 4 failure
+        run: |
+          if [ "${{ github.event.inputs.fail_job4 }}" == "true" ]; then
+            echo "Failing Job 4 intentionally"
+            exit 1
+          else
+            echo "Job 4 succeeded"
+          fi
+
   job5_wait:
     runs-on: ubuntu-latest
     needs: [job1, job2, job3, job4]
@@ -39,7 +51,10 @@ jobs:
         run: |
           echo "Job 5 is now waiting for release_trigger.txt..."
           while true; do
-            status_code=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token $GH_TOKEN" -H "Accept: application/vnd.github+json" https://api.github.com/repos/$REPO/contents/$FILE_PATH)
+            status_code=$(curl -s -o /dev/null -w "%{http_code}" \
+              -H "Authorization: token $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              https://api.github.com/repos/$REPO/contents/$FILE_PATH)
             if [ "$status_code" -eq 200 ]; then
               echo "Release_trigger.txt detected! Proceeding with Job 5.."
               break
