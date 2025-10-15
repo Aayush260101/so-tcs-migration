@@ -2,11 +2,6 @@ name: Test Workflow
 
 on:
   workflow_dispatch:
-    inputs:
-      fail_job4:
-        description: "Set to true to simulate failure in Job 4"
-        required: false
-        default: "false"
 
 jobs:
   job1:
@@ -30,13 +25,14 @@ jobs:
   job4:
     runs-on: ubuntu-latest
     steps:
-      - name: Simulate Job 4 failure
+      - name: Simulate random success/failure
         run: |
-          if [ "${{ github.event.inputs.fail_job4 }}" == "true" ]; then
-            echo "Failing Job 4 intentionally"
-            exit 1
+          echo "Running Job 4..."
+          if [ $((RANDOM % 2)) -eq 0 ]; then
+            echo "Job 4 succeeded!"
           else
-            echo "Job 4 succeeded"
+            echo "Job 4 failed randomly!"
+            exit 1
           fi
 
   job5_wait:
