@@ -26,14 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Simulate random success/failure
-        run: |
-          echo "Running Job 4..."
-          if [ $((RANDOM % 2)) -eq 0 ]; then
-            echo "Job 4 succeeded!"
-          else
-            echo "Job 4 failed randomly!"
-            exit 1
-          fi
+        run: echo "Hello"
 
   job5_wait:
     runs-on: ubuntu-latest
