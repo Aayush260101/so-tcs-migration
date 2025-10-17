@@ -1,0 +1,45 @@
+name: Test Wait Workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Job 1
+        run: echo "Hello World from Job 1"
+
+  job2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Job 2
+        run: echo "Hello World from Job 2"
+
+  job3:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Job 3
+        run: echo "Hello World from Job 3"
+
+  job4:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Simulate random success/failure
+        run: |
+          echo "Running Job 4..."
+          if [ $((RANDOM % 2)) -eq 0 ]; then
+            echo "Job 4 succeeded!"
+          else
+            echo "Job 4 failed randomly!"
+            exit 1
+          fi
+
+  job5_wait:
+    runs-on: ubuntu-latest
+    needs: [job1, job2, job3, job4]
+    environment:
+      name: manual-approval
+    steps:
+      - name: Proceed after approval
+        run: echo "Job 5 approved and running!"
